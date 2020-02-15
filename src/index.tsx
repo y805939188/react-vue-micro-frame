@@ -11,16 +11,23 @@ Vue.prototype._init = function(options: any) {
   __VUE_INTERNAL_INIT__.call(this, options);
 };
 
+interface Self {
+  Vue: typeof Vue;
+  [ propName: string ]: any;
+}
+
 interface IProps {
   url: string;
   name?: string;
   id?: string;
   visible?: boolean;
   extraProps?: { [propName: string]: any };
-  publicPathWillBeReplacedKeyWord?: string;
+  loadType?: 'xhr' | 'script';
+  instable_publicPathBeReplacedKey?: string;
 }
 
 export default class VueIframe extends React.PureComponent<IProps, any> {
+  private loadType: IProps['loadType'];
   private currentName: string; // 每个iframe的唯一标识
   private visible: boolean; // 是否显示
   private currentUrl: string; // 传进来的url
@@ -35,13 +42,14 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
 
   constructor(props: IProps) {
     super(props);
-    const { url, name, visible, publicPathWillBeReplacedKeyWord } = props;
+    const { loadType, url, name, visible, instable_publicPathBeReplacedKey } = props;
+    this.loadType = loadType || 'script';
     // 初始化时候是否显示
     this.visible = typeof visible === 'boolean' ? visible : true;
     // 获取到外部传来的url
     this.currentUrl = url;
     // 这个属性是用来标识要替换远程源代码中的publicPath的关键字
-    this.publicPathKey = publicPathWillBeReplacedKeyWord || '__WILL_BE_REPLACED_PUBLIC_PATH__';
+    this.publicPathKey = instable_publicPathBeReplacedKey || '__WILL_BE_REPLACED_PUBLIC_PATH__';
     // 这个正则会用来把远程源码中的__webpack_require__.p = 'xxxxx' 的xxxxx这个publiPath给替换掉
     this.publicPathReg = new RegExp(this.publicPathKey, 'g');
     // 生成每个iframe的唯一表示
@@ -137,6 +145,28 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
     return '';
   }
 
+  private executeOriginCode = (code: string): Self => {
+    const internalSelf: Self = { Vue };
+    const reg = this.publicPathReg;
+    const publicPath = this.currentPublicPath;
+    if (reg.test(code)) {
+      const codeStr = code.replace(reg, publicPath);
+      const originCodeFn = new Function("self", codeStr);
+      originCodeFn(internalSelf);
+    } else {
+      const temporaryDocument = (window.document as any);
+      const originCurrentScript = window.document.currentScript;
+      const temporaryScript = document.createElement('script');
+      temporaryScript.src = publicPath;
+      temporaryDocument.currentScript = temporaryScript;
+      const originCodeFn = new Function("self", code);
+      originCodeFn(internalSelf);
+      temporaryDocument.currentScript = originCurrentScript;
+      temporaryScript.remove && temporaryScript.remove();
+    };
+    return internalSelf;
+  } 
+
   private getOriginVueComponent = (): object => {
     return new Promise(res => {
       this.getOriginCode(this.currentUrl).then(data => {
@@ -144,10 +174,7 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
          * 先尝试直接通过XMLHttpRequest获取源代码
          */
         if (!data || typeof data !== 'string') throw Error('没有加载到远程vue组件');
-        const internalSelf: any = { Vue };
-        const codeStr = data.replace(this.publicPathReg, this.currentPublicPath);
-        const originCodeFn = new Function("self", codeStr);
-        originCodeFn(internalSelf);
+        const internalSelf = this.executeOriginCode(data);
         if (!this.currentName) (this.currentName = this.getCurrentName(internalSelf));
         if (!this.currentName) throw Error('没有获取到vue组件, 造成问题的原因可能是远程组件并未遵循umd规范');
         this.vueWrapper2.id = this.currentName;

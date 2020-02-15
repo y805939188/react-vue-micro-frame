@@ -238,6 +238,31 @@ function (_super) {
       return '';
     };
 
+    _this.executeOriginCode = function (code) {
+      var internalSelf = {
+        Vue: Vue
+      };
+      var reg = _this.publicPathReg;
+      var publicPath = _this.currentPublicPath;
+
+      if (reg.test(code)) {
+        var codeStr = code.replace(reg, publicPath);
+        var originCodeFn = new Function("self", codeStr);
+        originCodeFn(internalSelf);
+      } else {
+        var temporaryDocument = window.document;
+        var originCurrentScript = window.document.currentScript;
+        var temporaryScript = document.createElement('script');
+        temporaryScript.src = publicPath;
+        temporaryDocument.currentScript = temporaryScript;
+        var originCodeFn = new Function("self", code);
+        originCodeFn(internalSelf);
+        temporaryDocument.currentScript = originCurrentScript;
+        temporaryScript.remove && temporaryScript.remove();
+      }
+      return internalSelf;
+    };
+
     _this.getOriginVueComponent = function () {
       return new Promise(function (res) {
         _this.getOriginCode(_this.currentUrl).then(function (data) {
@@ -245,12 +270,9 @@ function (_super) {
            * 先尝试直接通过XMLHttpRequest获取源代码
            */
           if (!data || typeof data !== 'string') throw Error('没有加载到远程vue组件');
-          var internalSelf = {
-            Vue: Vue
-          };
-          var codeStr = data.replace(_this.publicPathReg, _this.currentPublicPath);
-          var originCodeFn = new Function("self", codeStr);
-          originCodeFn(internalSelf);
+
+          var internalSelf = _this.executeOriginCode(data);
+
           if (!_this.currentName) _this.currentName = _this.getCurrentName(internalSelf);
           if (!_this.currentName) throw Error('没有获取到vue组件, 造成问题的原因可能是远程组件并未遵循umd规范');
           _this.vueWrapper2.id = _this.currentName;
@@ -297,16 +319,18 @@ function (_super) {
       });
     };
 
-    var url = props.url,
+    var loadType = props.loadType,
+        url = props.url,
         name = props.name,
         visible = props.visible,
-        publicPathWillBeReplacedKeyWord = props.publicPathWillBeReplacedKeyWord; // 初始化时候是否显示
+        instable_publicPathBeReplacedKey = props.instable_publicPathBeReplacedKey;
+    _this.loadType = loadType || 'script'; // 初始化时候是否显示
 
     _this.visible = typeof visible === 'boolean' ? visible : true; // 获取到外部传来的url
 
     _this.currentUrl = url; // 这个属性是用来标识要替换远程源代码中的publicPath的关键字
 
-    _this.publicPathKey = publicPathWillBeReplacedKeyWord || '__WILL_BE_REPLACED_PUBLIC_PATH__'; // 这个正则会用来把远程源码中的__webpack_require__.p = 'xxxxx' 的xxxxx这个publiPath给替换掉
+    _this.publicPathKey = instable_publicPathBeReplacedKey || '__WILL_BE_REPLACED_PUBLIC_PATH__'; // 这个正则会用来把远程源码中的__webpack_require__.p = 'xxxxx' 的xxxxx这个publiPath给替换掉
 
     _this.publicPathReg = new RegExp(_this.publicPathKey, 'g'); // 生成每个iframe的唯一表示
 
