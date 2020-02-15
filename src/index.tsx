@@ -6,14 +6,15 @@ import singleSpaVue from 'single-spa-vue';
 const __VUE_INTERNAL_INIT__ = Vue.prototype._init;
 Vue.prototype._init = function(options: any) {
   /**
-   * TODO: 留个口儿 用来以后支持加载整个Vue应用(目前只支持加载组件)
+   * TODO: 留个口儿 用来以后支持加载整个Vue应用
    */
   __VUE_INTERNAL_INIT__.call(this, options);
 };
 
 interface IProps {
-  name: string | number;
   url: string;
+  name?: string;
+  id?: string;
   visible?: boolean;
   extraProps?: { [propName: string]: any };
   publicPathWillBeReplacedKeyWord?: string;
@@ -44,7 +45,7 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
     // 这个正则会用来把远程源码中的__webpack_require__.p = 'xxxxx' 的xxxxx这个publiPath给替换掉
     this.publicPathReg = new RegExp(this.publicPathKey, 'g');
     // 生成每个iframe的唯一表示
-    this.currentName = String(name || +new Date());
+    this.currentName = name || '';
     // 获取传进来的url的协议+域名+端口
     this.currentPublicPath = `${(
       new RegExp("^https?://[\\w-.]+(:\\d+)?", 'i').exec(this.currentUrl) || ['']
@@ -56,10 +57,13 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
   }
 
   componentDidMount = async () => {
+    const rootEleWrapper = this.rootNodeWrapper.current;
+    if (!rootEleWrapper) throw Error('没有vue组件的root节点');
     const component = await this.getOriginVueComponent();
     if (component && typeof component !== 'object') return;
     const lifecycles = this.registerVueComponent(this.vueWrapper2, component, this.currentName);
     this.parcel = mountRootParcel((lifecycles as ParcelConfig), { domElement: '-' });
+    if (this.visible) rootEleWrapper.appendChild(this.vueWrapper1);
   }
 
   componentDidUpdate = () => {
@@ -81,9 +85,9 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
    * 这个时候应该确认下项目是否还正常运行(八成报错)
    */
   componentWillUnmount = () => {
+    (this.rootNodeWrapper.current as any).removeChild(this.vueWrapper1);
     (this.vueWrapper1 as any) = null;
     (this.vueWrapper2 as any) = null;
-    this.rootNodeWrapper.current?.removeChild(this.vueWrapper1);
     this.parcel.unmount();
   }
 
@@ -125,6 +129,14 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
     });
   }
 
+  private getCurrentName = (self: any): string => {
+    for (const props in self) {
+      if (!self.hasOwnProperty(props)) break;
+      if (props !== 'Vue') return props;
+    }
+    return '';
+  }
+
   private getOriginVueComponent = (): object => {
     return new Promise(res => {
       this.getOriginCode(this.currentUrl).then(data => {
@@ -133,20 +145,18 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
          */
         if (!data || typeof data !== 'string') throw Error('没有加载到远程vue组件');
         const internalSelf: any = { Vue };
-        const currentName = this.currentName;
-        const rootEleWrapper = this.rootNodeWrapper.current;
-        if (!rootEleWrapper) throw Error('没有vue组件的root节点');
-        if (this.visible) rootEleWrapper.appendChild(this.vueWrapper1);
         const codeStr = data.replace(this.publicPathReg, this.currentPublicPath);
         const originCodeFn = new Function("self", codeStr);
         originCodeFn(internalSelf);
-        this.component = internalSelf[currentName];
+        if (!this.currentName) (this.currentName = this.getCurrentName(internalSelf));
+        if (!this.currentName) throw Error('没有获取到vue组件, 造成问题的原因可能是远程组件并未遵循umd规范');
+        this.vueWrapper2.id = this.currentName;
+        this.component = internalSelf[this.currentName];
         res(this.component);
       }).catch(err => {
         /**
          * 如果通过ajax获取不到的话 可能是跨域 通过创建script标签尝试获取
          */
-        console.warn(`${this.currentName} 这个vue组件可能存在跨域或请求错误`);
         const oScript1 = document.createElement('script');
         oScript1.type = 'text/javascript';
         const originSelf = window.self;
@@ -160,14 +170,18 @@ export default class VueIframe extends React.PureComponent<IProps, any> {
         oScript2.onload = () =>{
           const currentSelf: any = window.self;
           (window as any).self = originSelf;
+          if (!this.currentName) (this.currentName = this.getCurrentName(currentSelf));
+          if (!this.currentName) throw Error('没有获取到vue组件, 造成问题的原因可能是远程组件并未遵循umd规范');
+          this.vueWrapper2.id = this.currentName;
           this.component = currentSelf[this.currentName];
           oScript1.parentNode?.removeChild(oScript1);
           oScript2.parentNode?.removeChild(oScript2);
           return res(this.component);
         };
+        console.warn(`${this.currentName} 这个vue组件可能存在跨域或网络请求错误`);
       });
     })    
   }
 
-  render = () => (<div ref={this.rootNodeWrapper} />)
+  render = () => (<div id={this.props.id || ''} ref={this.rootNodeWrapper} />)
 }
