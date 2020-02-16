@@ -30,7 +30,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "concurrently": "^5.1.0",
     "css-loader": "^3.4.2",
-    "custom-event": "^1.0.1",
+    "dtsmake": "0.0.10",
     "express": "^4.17.1",
     "html-webpack-plugin": "^3.2.0",
     "http-server": "^0.12.0",

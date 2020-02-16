@@ -217,12 +217,12 @@ export default class VueIframe extends React.PureComponent<IProps, {}> {
     };
   }
 
-  registerComponentAndMount = (component: object): void => {
+  private registerComponentAndMount = (component: object): void => {
     const lifecycles = this.registerVueComponent(this.vueWrapper2, component, this.currentName);
     this.parcel = mountRootParcel((lifecycles as ParcelConfig), { domElement: '-' });
   }
 
-  addComponentToPage = (rootEleWrapper: HTMLDivElement): void => {
+  private addComponentToPage = (rootEleWrapper: HTMLDivElement): void => {
     /** 如果visible是false就暂时先把display置为none 之后再remove */
     if (!this.visible) this.vueWrapper1.style.display = 'none';
     const supportShadowDOM = !!this.vueWrapper1.attachShadow;
