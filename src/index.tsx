@@ -3,8 +3,6 @@ import Vue from 'vue';
 import { mountRootParcel, ParcelConfig } from 'single-spa';
 import singleSpaVue from 'single-spa-vue';
 
-window.onerror = (err) => { console.log('chucuole ', err) ; return true}
-
 const __VUE_INTERNAL_INIT__ = Vue.prototype._init;
 Vue.prototype._init = function(options: any) {
   /**
