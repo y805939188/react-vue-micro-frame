@@ -16,7 +16,7 @@ module.exports = {
   devtool: 'source-map',
   externals: [],
   devServer: {
-    port: 9999,
+    port: 23190,
     contentBase: `${demoPath}/src`,
     historyApiFallback: true,
   },

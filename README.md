@@ -13,7 +13,9 @@ npm run start
 
 
 # 使用方式
-
+```js
+npm install --save react-vue-mirco-frame
+```
 ```js
   /** 加载远程组件 **/
   import React from 'react';
