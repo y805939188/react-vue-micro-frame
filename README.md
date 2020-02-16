@@ -16,7 +16,7 @@ npm run start
 
 ```js
   /** 加载远程组件 **/
-  import React, { useState } from 'react';
+  import React from 'react';
   import VueIFrame from 'react-vue-mirco-frame';
   const Test = () => (
     <div>
@@ -26,7 +26,7 @@ npm run start
 ```
 ```js
   /** 加载本地组件 **/
-  import React, { useState } from 'react';
+  import React from 'react';
   import VueIFrame from 'react-vue-mirco-frame';
   import VueComponent from './vueComponent.vue';
   const Test = () => (
