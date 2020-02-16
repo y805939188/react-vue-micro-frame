@@ -26,6 +26,12 @@ export interface Self {
   [ propName: string ]: any;
 }
 
+export interface ISelecotr {
+  'getElementById': NonElementParentNode;
+  'querySelector': ParentNode;
+  'querySelectorAll': ParentNode;
+}
+
 export type IProps = IProps1 | IProps2;
 
 declare class VueFrame extends React.Component<IProps, {}> {
@@ -37,7 +43,7 @@ declare class VueFrame extends React.Component<IProps, {}> {
   private currentPublicPath: string;
   private publicPathKey: string;
   private publicPathReg: RegExp;
-  private rootNodeWrapper: RefObject<HTMLDivElement>;;
+  private rootNodeWrapper: React.RefObject<HTMLDivElement>;;
   private component: any;
   private parcel: any;
   private vueWrapper1: HTMLDivElement;
