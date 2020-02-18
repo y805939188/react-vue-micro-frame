@@ -162,8 +162,7 @@ HTMLHeadElement.prototype.appendChild = function <T extends Node>(this: any, new
         if (!currentName) return originAppendChild.call(this, element) as T;
         setTimeout(() => {
           getWrapper(currentName)?.shadowRoot?.appendChild(element);
-        })
-        return originAppendChild.call(this, element.cloneNode()) as T;
+        });
       }
     }
   }
@@ -188,6 +187,7 @@ export default class VueIframe extends React.PureComponent<IProps, {}> {
   private vueWrapper2: HTMLDivElement = document.createElement('div'); // 真正vue需要挂载的节点
   private styleElements: HTMLLinkElement[] | HTMLStyleElement[] = []; // 用来临时存放要被添加的style标签
   private runId: number = -1; // 当前正在跑的vue组件的runId 唯一
+  private isLocal: boolean; // 是否是本地组件
 
   constructor(props: IProps) {
     super(props);
@@ -198,6 +198,8 @@ export default class VueIframe extends React.PureComponent<IProps, {}> {
     this.visible = typeof visible === 'boolean' ? visible : true;
     // 获取到外部传进来的vue组件
     this.component = component;
+    // 判断是否是本地组件
+    this.isLocal = !!component;
     // 获取到外部传来的url
     this.currentUrl = jsurl || '';
     // 获取外部传进来的css的url 可能没有
@@ -221,10 +223,10 @@ export default class VueIframe extends React.PureComponent<IProps, {}> {
     const rootEleWrapper = this.rootNodeWrapper.current;
     if (!rootEleWrapper) throw Error('没有vue组件的root节点');
     /** 如果外部传了component就随机起个name */
-    const component = this.props.component || await this.getOriginVueComponent();
+    const component = this.isLocal ? this.component : await this.getOriginVueComponent();
     if (!this.isVueComponent(component)) return;
     this.registerComponentAndMount(component);
-    this.addComponentToPage(rootEleWrapper);
+    this.addComponentToPage(rootEleWrapper, this.isLocal);
   }
 
   componentDidUpdate = () => {
@@ -267,10 +269,10 @@ export default class VueIframe extends React.PureComponent<IProps, {}> {
     this.parcel = mountRootParcel((lifecycles as ParcelConfig), { domElement: '-' });
   }
 
-  private addComponentToPage = (rootEleWrapper: HTMLDivElement): void => {
+  private addComponentToPage = (rootEleWrapper: HTMLDivElement, isLocal?: boolean): void => {
     /** 如果visible是false就暂时先把display置为none 之后再remove */
     if (!this.visible) this.vueWrapper1.style.display = 'none';
-    const supportShadowDOM = !!this.vueWrapper1.attachShadow;
+    const supportShadowDOM = !!this.vueWrapper1.attachShadow && !isLocal;
     const root = supportShadowDOM ? (
       (this.vueWrapper1.attachShadow({ mode: 'open' })) &&
       this.vueWrapper1.shadowRoot
@@ -280,7 +282,7 @@ export default class VueIframe extends React.PureComponent<IProps, {}> {
       const oLink = document.createElement('link');
       oLink.rel = "stylesheet";
       oLink.href = cssurl;
-      root?.appendChild(oLink);
+      isLocal ? document.head.appendChild(oLink) : root?.appendChild(oLink);
     }
 
     this.styleElements.forEach(style => {

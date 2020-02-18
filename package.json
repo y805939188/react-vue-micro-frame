@@ -1,6 +1,6 @@
 {
   "name": "react-vue-mirco-frame",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "react-vue-mirco-frame",
   "main": "lib/index.js",
   "scripts": {
@@ -73,11 +73,13 @@
     "vue": "^2.6.11"
   },
   "keywords": [
-    "react-mirco-frontends",
-    "vue-mirco-frontends",
-    "react-vue-mirco-frontends",
-    "mirco-frontends",
+    "react-micro-frontends",
+    "vue-micro-frontends",
+    "react-vue-micro-frontends",
+    "micro-frontends",
     "react-vue-mirco-frame",
+    "react-vue-micro-frame",
+    "vue-in-react",
     "vue in react",
     "react-vue"
   ]
