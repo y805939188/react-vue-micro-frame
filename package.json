@@ -1,7 +1,7 @@
 {
-  "name": "react-vue-mirco-frame",
-  "version": "0.0.11",
-  "description": "react-vue-mirco-frame",
+  "name": "react-vue-micro-frame",
+  "version": "0.0.12",
+  "description": "react-vue-micro-frame",
   "main": "lib/index.js",
   "scripts": {
     "start": "concurrently \"npm run start:demo\" \"npm run start:rollup\" \"node ./mock-component/server.js\"",
@@ -77,7 +77,8 @@
     "vue-micro-frontends",
     "react-vue-micro-frontends",
     "micro-frontends",
-    "react-vue-mirco-frame",
+    "vue-micro-frontends",
+    "react-micro-frontends",
     "react-vue-micro-frame",
     "vue-in-react",
     "vue in react",
