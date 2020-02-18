@@ -1,6 +1,6 @@
 {
   "name": "react-vue-mirco-frame",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "react-vue-mirco-frame",
   "main": "lib/index.js",
   "scripts": {
@@ -77,6 +77,8 @@
     "vue-mirco-frontends",
     "react-vue-mirco-frontends",
     "mirco-frontends",
-    "react-vue-mirco-frame"
+    "react-vue-mirco-frame",
+    "vue in react",
+    "react-vue"
   ]
 }
