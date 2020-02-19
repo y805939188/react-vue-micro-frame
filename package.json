@@ -1,6 +1,6 @@
 {
   "name": "react-vue-micro-frame",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "react-vue-micro-frame",
   "main": "lib/index.js",
   "scripts": {
@@ -71,6 +71,10 @@
     "single-spa": "^4.4.3",
     "single-spa-vue": "1.7.0",
     "vue": "^2.6.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:y805939188/react-vue-micro-frame.git"
   },
   "keywords": [
     "react-micro-frontends",
