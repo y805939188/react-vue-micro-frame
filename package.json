@@ -1,6 +1,6 @@
 {
   "name": "react-vue-micro-frame",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "react-vue-micro-frame",
   "main": "lib/index.js",
   "scripts": {

@@ -8,11 +8,6 @@ import 'antd/dist/antd.css';
 import VueComponent from './components/index.vue';
 
 const TabPane = Tabs.TabPane;
-const defaultData = {
-  nodeId: "43ffb22e-5b08-4c85-a866-e00dd3e08bfe",
-  dagRunId: "22404",
-}
-const defaultTaskId = "22404";
 const Test: React.FC<{}> = () => {
   const [ number1, setNumber1 ] = useState<number>(6);
   const [ active2, setActive2 ] = useState<boolean>(true);
@@ -49,12 +44,7 @@ const Test: React.FC<{}> = () => {
           <Tabs.TabPane tab={'React组件'} key="4" >
             <div className="log-dialog">
               <ReactFrame
-                extraProps={{
-                  // stop: false,
-                  // data: defaultData,
-                  // taskId: defaultTaskId,
-                  number: number1
-                }}
+                extraProps={{ number: number1 }}
                 jsurl="http://127.0.0.1:20522/reactComponent2.js"
               />
             </div>
