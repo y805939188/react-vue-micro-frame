@@ -46,8 +46,8 @@ declare class VueFrame extends React.Component<IProps, {}> {
   private rootNodeWrapper: React.RefObject<HTMLDivElement>;;
   private component: any;
   private parcel: any;
-  private vueWrapper1: HTMLDivElement;
-  private vueWrapper2: HTMLDivElement;
+  private oWrapper1: HTMLDivElement;
+  private oWrapper2: HTMLDivElement;
   private styleElements: HTMLLinkElement[] | HTMLStyleElement[];
 
 	constructor(props: IProps);
@@ -86,8 +86,8 @@ declare class ReactFrame extends React.Component<IProps, {}> {
   private rootNodeWrapper: React.RefObject<HTMLDivElement>;;
   private component: any;
   private parcel: any;
-  private vueWrapper1: HTMLDivElement;
-  private vueWrapper2: HTMLDivElement;
+  private oWrapper1: HTMLDivElement;
+  private oWrapper2: HTMLDivElement;
   private styleElements: HTMLLinkElement[] | HTMLStyleElement[];
 
 	constructor(props: IProps);
