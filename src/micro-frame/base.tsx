@@ -11,6 +11,7 @@ interface IProps0 {
   extraProps?: { [propName: string]: any };
   loadType?: 'xhr' | 'script';
   instable_publicPath?: string;
+  instable_externals?: { [prop: string]: any };
 }
 
 interface IProps1 extends IProps0 {
@@ -178,6 +179,7 @@ export default abstract class VueIframe extends React.PureComponent<IProps, {}> 
   protected runId: number = -1; // 当前正在跑的vue组件的runId 唯一
   protected isLocal: boolean; // 是否是本地组件
   protected extraProps: any; // 额外的属性
+  private instable_externals: IProps0['instable_externals']; // 可能用不到
 
   constructor(props: IProps) {
     super(props);
@@ -204,6 +206,8 @@ export default abstract class VueIframe extends React.PureComponent<IProps, {}> 
     getWrapper(this.currentName, this.oWrapper1);
     this.oWrapper1.style.height = '100%';
     this.oWrapper2.style.height = '100%';
+    // 暂时可能用不到的
+    this.instable_externals = this.props.instable_externals || {};
   }
 
   componentDidMount = async () => {
@@ -358,7 +362,13 @@ export default abstract class VueIframe extends React.PureComponent<IProps, {}> 
         document.body.appendChild(oScript);
         const runId = this.runId = toolFunction(this.oWrapper1) as number;
         (window as any).module = {};
-        (window as any).require = (str: string) => (str === 'vue') && this.framework;
+        (window as any).require = (str: string) => {
+          if (!str) return;
+          if (str === 'vue' || str === 'react') return this.framework;
+          const external = (this.instable_externals || {})[str];
+          if (!external) throw Error(`组件可能需要 ${str} 作为external`);
+          return external;
+        };
         window.exports = null;
         oScript.onload = () => {
           const exports = window.module.exports;
