@@ -21,31 +21,31 @@ npm install --save react-vue-micro-frame
 ```js
   /** Load remote components **/
   import React from 'react';
-  import VueIFrame from 'react-vue-micro-frame';
+  import VueFrame from 'react-vue-micro-frame';
   const Test = () => (
     <div>
-      <VueIFrame jsurl="http://originPath/vueComponent.umd.js"/>
+      <VueFrame jsurl="http://originPath/vueComponent.umd.js"/>
     </div>
   )
 ```
 ```js
   /** Load local components **/
   import React from 'react';
-  import VueIFrame from 'react-vue-micro-frame';
+  import VueFrame from 'react-vue-micro-frame';
   import VueComponent from './vueComponent.vue';
   const Test = () => (
     <div>
-      <VueIFrame componet={VueComponent} />
+      <VueFrame componet={VueComponent} />
     </div>
   )
 ```
 ```js
   /** You can also load a remote react component **/
   import React from 'react';
-  import { ReactComponent } from 'react-vue-micro-frame';
+  import { ReactFrame } from 'react-vue-micro-frame';
   const Test = () => (
     <div>
-      <ReactComponent jsurl="http://reactComponentAddress.umd.js" />
+      <ReactFrame jsurl="http://reactComponentAddress.umd.js" />
     </div>
   )
 ```

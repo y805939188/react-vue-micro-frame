@@ -21,7 +21,7 @@ npm install --save react-vue-micro-frame
 ```js
   /** 加载远程组件 **/
   import React from 'react';
-  import VueIFrame from 'react-vue-micro-frame';
+  import VueFrame from 'react-vue-micro-frame';
   const Test = () => (
     <div>
       <VueIFrame jsurl="http://originPath/vueComponent.umd.js"/>
@@ -31,21 +31,21 @@ npm install --save react-vue-micro-frame
 ```js
   /** 加载本地组件 **/
   import React from 'react';
-  import VueIFrame from 'react-vue-micro-frame';
+  import VueFrame from 'react-vue-micro-frame';
   import VueComponent from './vueComponent.vue';
   const Test = () => (
     <div>
-      <VueIFrame componet={VueComponent} />
+      <VueFrame componet={VueComponent} />
     </div>
   )
 ```
 ```js
   /** 也可以加载一个远程的react组件 **/
   import React from 'react';
-  import { ReactComponent } from 'react-vue-micro-frame';
+  import { ReactFrame } from 'react-vue-micro-frame';
   const Test = () => (
     <div>
-      <VueIFrame jsurl="http://reactComponent.umd.js" />
+      <ReactFrame jsurl="http://reactComponentAddress.umd.js" />
     </div>
   )
 ```
