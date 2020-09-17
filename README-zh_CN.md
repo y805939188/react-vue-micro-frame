@@ -72,7 +72,12 @@ npm install --save react-vue-micro-frame
 - [x] 跨域加载
 - [x] 静态资源加载
 - [x] css样式隔离
-- [ ] 加载整个vue应用
+
+# TODO
+- [ ] 调研是否可基于 qiankun2.x 重构
+- [ ] 加载整个 vue/react 应用
+- [ ] frame 组件外渲染 (由于当前设计类似于原生 iframe 标签，所以无法做到组件范围外的渲染)
+- [ ] frame 组件与外部通信的pipeline (由于当前设计类似原生 iframe 标签，只能接受外部参数，但是没有专门用来和外部其他组件通信的 pipeline，这对于组件外部需要状态管理等场景很有必要)
 
 # 可能存在的问题
 1. 样式隔离使用的是shadow dom的方式, 所以暂时不支持ie
